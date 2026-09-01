@@ -314,7 +314,7 @@ function Dashboard() {
 
         <div style={{ maxWidth: 480, margin: '0 auto' }}>
           <p style={{ fontSize: 13, color: 'var(--color-header-light)', margin: '0 0 2px' }}>
-            Welcome back
+            Welcome
           </p>
           <p
             style={{
