@@ -100,7 +100,7 @@ function Dashboard() {
 
   const fetchStreak = async (habitId: number) => {
     try {
-      const res = await axios.get(`http://localhost:5000/habits/${habitId}/streak`, {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/habits/${habitId}/streak`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setStreaks((prev) => ({ ...prev, [habitId]: res.data.streak }));
@@ -113,8 +113,8 @@ function Dashboard() {
     try {
       const url =
         currentUser.role === 'coach'
-          ? `http://localhost:5000/habits/coach/${currentUser.id}`
-          : `http://localhost:5000/habits/client/${currentUser.id}`;
+          ? `${import.meta.env.VITE_API_URL}/habits/coach/${currentUser.id}`
+          : `${import.meta.env.VITE_API_URL}/habits/client/${currentUser.id}`;
 
       const res = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` },
@@ -132,7 +132,7 @@ function Dashboard() {
 
     try {
       const res = await axios.get(
-        `http://localhost:5000/bookings/coach/${currentUser.id}`,
+        `${import.meta.env.VITE_API_URL}/bookings/coach/${currentUser.id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setBookings(res.data);
@@ -146,7 +146,7 @@ function Dashboard() {
 
     try {
       const res = await axios.get(
-        `http://localhost:5000/bookings/coach/${currentUser.id}/accepted-clients`,
+        `${import.meta.env.VITE_API_URL}/bookings/coach/${currentUser.id}/accepted-clients`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setAcceptedClients(res.data);
@@ -182,7 +182,7 @@ function Dashboard() {
 
     try {
       await axios.post(
-        'http://localhost:5000/habits',
+        `${import.meta.env.VITE_API_URL}/habits`,
         { clientId: Number(clientId), title, description },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -199,7 +199,7 @@ function Dashboard() {
   const handleCheckin = async (habitId: number) => {
     try {
       await axios.post(
-        `http://localhost:5000/habits/${habitId}/checkin`,
+        `${import.meta.env.VITE_API_URL}/habits/${habitId}/checkin`,
         { completed: true },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -215,7 +215,7 @@ function Dashboard() {
 
     try {
       await axios.patch(
-        `http://localhost:5000/bookings/${bookingId}`,
+        `${import.meta.env.VITE_API_URL}/bookings/${bookingId}`,
         { status },
         { headers: { Authorization: `Bearer ${token}` } }
       );

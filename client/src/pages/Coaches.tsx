@@ -35,7 +35,7 @@ function Coaches() {
           return;
         }
 
-        const response = await fetch('http://localhost:5000/coaches', {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/coaches`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -61,7 +61,7 @@ function Coaches() {
     setActionError('');
 
     try {
-      const response = await fetch('http://localhost:5000/bookings', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/bookings`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
