@@ -1,0 +1,51 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@500&family=Inter:wght@400;500&display=swap');
+
+:root {
+  --color-header: #3F7A5C;
+  --color-header-light: #DCEBE1;
+  --color-accent: #E8A33D;
+  --color-accent-text: #4A2E0A;
+
+  --color-bg: #F7F5F0;
+  --color-card-bg: #FFFFFF;
+  --color-border: #E4E1D8;
+
+  --color-text: #3D3D3D;
+  --color-text-muted: #8A8A85;
+
+  --color-streak-bg: #FBEAD2;
+  --color-streak-text: #854F0B;
+
+  --color-streak-zero-bg: #EFEBE0;
+  --color-streak-zero-text: #6B6B64;
+
+  --color-avatar-bg: #EAE7DC;
+
+  --font-display: 'Fraunces', serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+
+  --radius-card: 10px;
+  --radius-pill: 20px;
+  --radius-button: 8px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+button {
+  font-family: var(--font-body);
+  cursor: pointer;
+}
+
+input,
+select {
+  font-family: var(--font-body);
+}
