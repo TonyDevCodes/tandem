@@ -180,7 +180,6 @@ function CoachesInner() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [requestedIds, setRequestedIds] = useState<number[]>([]);
-  const [actionError, setActionError] = useState('');
   const [modalCoach, setModalCoach] = useState<Coach | null>(null);
   const navigate = useNavigate();
 
@@ -324,7 +323,6 @@ function CoachesInner() {
               <p style={{ fontSize: 13, color: 'var(--color-text-muted)' }}>Loading coaches...</p>
             )}
             {error && <p style={{ color: '#B23A3A', fontSize: 13 }}>{error}</p>}
-            {actionError && <p style={{ color: '#B23A3A', fontSize: 13 }}>{actionError}</p>}
 
             {!loading && !error && coaches.length === 0 && (
               <p style={{ fontSize: 13, color: 'var(--color-text-muted)' }}>
