@@ -1,39 +1,83 @@
-# Tandem
+# Tandem — Coach & Client Habit Tracker Marketplace
 
-A two-sided marketplace where fitness/nutrition coaches and their clients track daily habits and streaks together.
+A full-stack marketplace that connects fitness/nutrition coaches with their clients for daily habit tracking, progress monitoring, and payments.
 
-## Live Demo
+**Live Demo:** [https://tandem-client.onrender.com](https://tandem-client.onrender.com)
+**Test Accounts:**
+- Client: `client1@tandem.com` / `test123`
+- Coach: `coach1@tandem.com` / `test123`
 
-**Frontend:** https://tandem-client.onrender.com
-
-Test accounts:
-- **Coach:** coach1@tandem.com / test123
-- **Client:** client1@tandem.com / test123
-
-## Problem it solves
-
-Individual coaches lack a simple tool to monitor multiple clients at once and assign personalized tasks to each. Tandem formalizes the coach-client relationship (request → accept) and makes daily progress visible to both sides.
-
-## Tech Stack
-
-- **Backend:** Node.js, Express, PostgreSQL (hosted on Neon), JWT authentication
-- **Frontend:** React, TypeScript, Vite
-- **Hosting:** Render (Web Service for backend, Static Site for frontend), auto-deploy from GitHub
+---
 
 ## Features
 
-- Role-based authentication (Coach vs Client) with JWT
-- Marketplace discovery — clients browse and request coaches
-- Booking flow with request/accept/reject, enforced with a `UNIQUE(coach_id, client_id)` constraint
-- Habit creation restricted to accepted coach-client relationships only
-- Daily check-ins with streak tracking
-- Coach dashboard: manage clients, create habits, review pending requests
-- Client dashboard: browse coaches, check in on habits, view streaks
+### Phase 1 – Core Marketplace
+- Two-sided marketplace (Coaches ↔ Clients)
+- Booking system (request → accept/reject)
+- Habit creation & daily check-ins
+- Automatic streak calculation
+- Role-based dashboards (Coach vs Client)
+- JWT authentication with protected routes
 
-## Project Structure
+### Phase 2 – Payments
+- Stripe Connect Express integration
+- Coaches set their own session price
+- "Authorize now, capture later" payment flow
+- Coaches receive payments directly
+- Full payment status handling (authorized → captured/canceled)
 
-- `client/` — React + TypeScript frontend (Vite)
-- `server/` — Node.js + Express backend, PostgreSQL via Neon
+---
+
+## Tech Stack
+
+**Frontend**
+- React + TypeScript + Vite
+- Custom design system
+
+**Backend**
+- Node.js + Express
+- PostgreSQL (Neon)
+- JWT Authentication
+- Role-based access control
+
+**Payments**
+- Stripe Connect Express
+- Stripe Elements
+
+**Deployment**
+- Frontend & Backend on Render
+- Auto-deploy from GitHub
+
+---
+
+## Architecture Highlights
+
+- Clean separation between client and server
+- Database constraints to prevent invalid states
+- Secure payment flow with manual capture
+- Middleware for role and relationship checks
+- End-to-end tested booking + payment logic
+
+---
+
+## Getting Started
+
+### Backend
+```bash
+cd server
+npm install
+# Add your .env (DATABASE_URL, JWT_SECRET, STRIPE keys)
+npm run dev
+```
+
+### Frontend
+```bash
+cd client
+npm install
+npm run dev
+```
+
+---
 
 ## API Endpoints
 
@@ -42,6 +86,16 @@ Individual coaches lack a simple tool to monitor multiple clients at once and as
 - `POST /auth/login`
 - `GET /auth/me`
 
+**Coaches**
+- `GET /coaches` — marketplace discovery
+- `PATCH /coaches/me` — coach sets their price
+
+**Bookings**
+- `POST /bookings` — client requests a coach (creates Stripe PaymentIntent)
+- `GET /bookings/coach/:id`
+- `GET /bookings/coach/:id/accepted-clients`
+- `PATCH /bookings/:id` — accept (capture payment) / reject (cancel authorization)
+
 **Habits**
 - `POST /habits` — coach creates a habit (requires accepted client relationship)
 - `GET /habits/coach/:id`
@@ -49,17 +103,14 @@ Individual coaches lack a simple tool to monitor multiple clients at once and as
 - `POST /habits/:id/checkin`
 - `GET /habits/:id/streak`
 
-**Coaches**
-- `GET /coaches` — marketplace discovery
+**Stripe**
+- `POST /stripe/connect` — coach Connect Express onboarding
+- `GET /stripe/status` — check onboarding status
 
-**Bookings**
-- `POST /bookings` — client requests a coach
-- `GET /bookings/coach/:id`
-- `GET /bookings/coach/:id/accepted-clients`
-- `PATCH /bookings/:id` — accept/reject
+---
 
-## Current Status
+## Project Status
 
-**Phase 1 (live):** Full marketplace flow without in-app payments — coach discovery, booking, habit/streak tracking between linked coach-client pairs.
-
-**Phase 2 (planned):** Stripe integration for in-app payments.
+- Phase 1: Completed
+- Phase 2 (Stripe Connect): Completed
+- Future: Notifications, advanced analytics, mobile responsiveness improvements
