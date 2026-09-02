@@ -94,6 +94,13 @@ function Dashboard() {
   const [bookings, setBookings] = useState<any[]>([]);
   const [bookingError, setBookingError] = useState('');
   const [acceptedClients, setAcceptedClients] = useState<any[]>([]);
+  const [stripeStatus, setStripeStatus] = useState<{ connected: boolean; chargesEnabled?: boolean } | null>(null);
+  const [stripeLoading, setStripeLoading] = useState(false);
+  const [stripeError, setStripeError] = useState('');
+  const [priceInput, setPriceInput] = useState('');
+  const [priceLoading, setPriceLoading] = useState(false);
+  const [priceError, setPriceError] = useState('');
+  const [priceSaved, setPriceSaved] = useState(false);
   const navigate = useNavigate();
 
   const token = localStorage.getItem('token');
@@ -155,6 +162,35 @@ function Dashboard() {
     }
   };
 
+  const fetchStripeStatus = async (currentUser: any) => {
+    if (currentUser.role !== 'coach') return;
+
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/stripe/status`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setStripeStatus(res.data);
+    } catch (err: any) {
+      // silent fail, s'ndalon UI
+    }
+  };
+
+  const fetchCoachPrice = async (currentUser: any) => {
+    if (currentUser.role !== 'coach') return;
+
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/auth/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const cents = res.data.user.price_cents;
+      if (cents !== null && cents !== undefined) {
+        setPriceInput((cents / 100).toFixed(2));
+      }
+    } catch (err: any) {
+      // silent fail, s'ndalon UI
+    }
+  };
+
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
 
@@ -168,6 +204,8 @@ function Dashboard() {
     fetchHabits(parsedUser);
     fetchBookings(parsedUser);
     fetchAcceptedClients(parsedUser);
+    fetchStripeStatus(parsedUser);
+    fetchCoachPrice(parsedUser);
   }, [navigate]);
 
   const handleLogout = () => {
@@ -224,6 +262,53 @@ function Dashboard() {
       fetchAcceptedClients(user);
     } catch (err: any) {
       setBookingError(err.response?.data?.error || 'Failed to update request');
+    }
+  };
+
+  const handleConnectStripe = async () => {
+    setStripeError('');
+    setStripeLoading(true);
+
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/stripe/connect`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      window.location.href = res.data.url;
+    } catch (err: any) {
+      setStripeError(err.response?.data?.error || 'Failed to connect Stripe');
+      setStripeLoading(false);
+    }
+  };
+
+  const handleSavePrice = async () => {
+    setPriceError('');
+    setPriceSaved(false);
+
+    const priceNum = Math.round(parseFloat(priceInput) * 100);
+
+    if (isNaN(priceNum) || priceNum < 0) {
+      setPriceError('Enter a valid price');
+      return;
+    }
+
+    setPriceLoading(true);
+
+    try {
+      await axios.patch(
+        `${import.meta.env.VITE_API_URL}/coaches/me`,
+        { price_cents: priceNum },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setPriceSaved(true);
+      setTimeout(() => setPriceSaved(false), 2000);
+    } catch (err: any) {
+      setPriceError(err.response?.data?.error || 'Failed to save price');
+    } finally {
+      setPriceLoading(false);
     }
   };
 
@@ -365,6 +450,118 @@ function Dashboard() {
 
         {user.role === 'coach' && (
           <div style={{ marginBottom: 28 }}>
+            <p style={sectionLabelStyle}>Payments</p>
+            {stripeError && (
+              <p style={{ color: '#B23A3A', fontSize: 13, marginBottom: 8 }}>{stripeError}</p>
+            )}
+            <div
+              style={{
+                ...cardStyle,
+                justifyContent: stripeStatus?.connected ? 'center' : 'space-between',
+              }}
+            >
+              <div style={{ textAlign: stripeStatus?.connected ? 'center' : 'left' }}>
+                <p style={{ fontSize: 14, fontWeight: 500, margin: '0 0 2px' }}>
+                  {stripeStatus?.connected ? 'Stripe connected' : 'Connect Stripe to get paid'}
+                </p>
+                <p style={{ fontSize: 12, color: 'var(--color-text-muted)', margin: 0 }}>
+                  {stripeStatus?.connected
+                    ? 'You can accept bookings and receive payouts.'
+                    : 'Required before clients can book you.'}
+                </p>
+              </div>
+              {!stripeStatus?.connected && (
+                <button
+                  onClick={handleConnectStripe}
+                  disabled={stripeLoading}
+                  style={{
+                    background: 'var(--color-header)',
+                    color: '#F7F5F0',
+                    border: 'none',
+                    borderRadius: 'var(--radius-button)',
+                    padding: '7px 14px',
+                    fontSize: 13,
+                    fontWeight: 500,
+                    opacity: stripeLoading ? 0.6 : 1,
+                  }}
+                >
+                  {stripeLoading ? 'Connecting...' : 'Connect Stripe'}
+                </button>
+              )}
+            </div>
+
+            <div
+              style={{
+                ...cardStyle,
+                flexDirection: 'column',
+                alignItems: 'stretch',
+                marginTop: 8,
+                marginBottom: 0,
+              }}
+            >
+              <p style={{ fontSize: 14, fontWeight: 500, margin: '0 0 2px' }}>Your rate</p>
+              <p style={{ fontSize: 12, color: 'var(--color-text-muted)', margin: '0 0 10px' }}>
+                Clients see this price before requesting a session.
+              </p>
+              {priceError && (
+                <p style={{ color: '#B23A3A', fontSize: 13, marginBottom: 8 }}>{priceError}</p>
+              )}
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: '0.5px solid var(--color-border)',
+                    borderRadius: 'var(--radius-button)',
+                    padding: '9px 10px',
+                    flex: 1,
+                  }}
+                >
+                  <span style={{ fontSize: 14, color: 'var(--color-text-muted)', marginRight: 4 }}>
+                    €
+                  </span>
+                  <input
+                    value={priceInput}
+                    onChange={(e) => setPriceInput(e.target.value)}
+                    inputMode="decimal"
+                    placeholder="0.00"
+                    style={{
+                      border: 'none',
+                      outline: 'none',
+                      padding: 0,
+                      fontSize: 14,
+                      width: `${Math.max(priceInput.length, 4)}ch`,
+                      textAlign: 'center',
+                    }}
+                  />
+                  <span style={{ fontSize: 12, color: 'var(--color-text-muted)', marginLeft: 4 }}>
+                    /session
+                  </span>
+                </div>
+                <button
+                  onClick={handleSavePrice}
+                  disabled={priceLoading}
+                  style={{
+                    background: priceSaved ? 'var(--color-streak-text)' : 'var(--color-header)',
+                    color: '#F7F5F0',
+                    border: 'none',
+                    borderRadius: 'var(--radius-button)',
+                    padding: '9px 14px',
+                    fontSize: 13,
+                    fontWeight: 500,
+                    opacity: priceLoading ? 0.6 : 1,
+                  }}
+                >
+                  {priceLoading ? 'Saving...' : priceSaved ? 'Saved' : 'Save'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {user.role === 'coach' && (
+          <div style={{ marginBottom: 28 }}>
             <p style={sectionLabelStyle}>Pending requests</p>
             {bookingError && (
               <p style={{ color: '#B23A3A', fontSize: 13 }}>{bookingError}</p>
@@ -475,6 +672,8 @@ function Dashboard() {
                       fontSize: 14,
                       border: '0.5px solid var(--color-border)',
                       borderRadius: 'var(--radius-button)',
+                      textAlign: 'center',
+                      textAlignLast: 'center',
                     }}
                   >
                     <option value="">Select a client</option>

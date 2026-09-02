@@ -1,5 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 interface Coach {
   id: number;
@@ -16,12 +20,168 @@ function getInitials(name: string) {
     .slice(0, 2);
 }
 
-function Coaches() {
+function BookingModal({
+  coach,
+  onClose,
+  onSuccess,
+}: {
+  coach: Coach;
+  onClose: () => void;
+  onSuccess: (coachId: number) => void;
+}) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [cardError, setCardError] = useState('');
+  const [processing, setProcessing] = useState(false);
+
+  const token = localStorage.getItem('token');
+
+  const handleConfirmPayment = async () => {
+    setCardError('');
+
+    if (!stripe || !elements) return;
+
+    setProcessing(true);
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/bookings`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ coachId: coach.id }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setCardError(data.error || 'Failed to create request');
+        setProcessing(false);
+        return;
+      }
+
+      const cardElement = elements.getElement(CardElement);
+      if (!cardElement) {
+        setCardError('Card details not found');
+        setProcessing(false);
+        return;
+      }
+
+      const result = await stripe.confirmCardPayment(data.client_secret, {
+        payment_method: { card: cardElement },
+      });
+
+      if (result.error) {
+        setCardError(result.error.message || 'Card authorization failed');
+        setProcessing(false);
+        return;
+      }
+
+      onSuccess(coach.id);
+    } catch (err) {
+      setCardError('Something went wrong. Please try again.');
+      setProcessing(false);
+    }
+  };
+
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: 'rgba(23, 32, 27, 0.5)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 100,
+        padding: 20,
+      }}
+    >
+      <div
+        style={{
+          background: 'var(--color-card-bg)',
+          borderRadius: 'var(--radius-card)',
+          padding: 24,
+          width: '100%',
+          maxWidth: 380,
+        }}
+      >
+        <p style={{ fontSize: 16, fontWeight: 500, margin: '0 0 4px' }}>Request {coach.name}</p>
+        <p style={{ fontSize: 13, color: 'var(--color-text-muted)', margin: '0 0 18px' }}>
+          Your card is authorized now and only charged once {coach.name.split(' ')[0]} accepts.
+        </p>
+
+        <div
+          style={{
+            border: '0.5px solid var(--color-border)',
+            borderRadius: 'var(--radius-button)',
+            padding: '12px 10px',
+            marginBottom: 12,
+          }}
+        >
+          <CardElement
+            options={{
+              style: {
+                base: { fontSize: '14px', color: '#17201B', '::placeholder': { color: '#9A9689' } },
+              },
+            }}
+          />
+        </div>
+
+        {cardError && (
+          <p style={{ color: '#B23A3A', fontSize: 13, marginBottom: 12 }}>{cardError}</p>
+        )}
+
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button
+            onClick={onClose}
+            disabled={processing}
+            style={{
+              flex: 1,
+              background: 'transparent',
+              border: '0.5px solid var(--color-border)',
+              borderRadius: 'var(--radius-button)',
+              padding: '10px',
+              fontSize: 13,
+              color: 'var(--color-text-muted)',
+            }}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleConfirmPayment}
+            disabled={processing || !stripe}
+            style={{
+              flex: 1,
+              background: 'var(--color-header)',
+              color: '#F7F5F0',
+              border: 'none',
+              borderRadius: 'var(--radius-button)',
+              padding: '10px',
+              fontSize: 13,
+              fontWeight: 500,
+              opacity: processing ? 0.6 : 1,
+            }}
+          >
+            {processing ? 'Confirming...' : 'Confirm & Pay'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CoachesInner() {
   const [coaches, setCoaches] = useState<Coach[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [requestedIds, setRequestedIds] = useState<number[]>([]);
   const [actionError, setActionError] = useState('');
+  const [modalCoach, setModalCoach] = useState<Coach | null>(null);
   const navigate = useNavigate();
 
   const token = localStorage.getItem('token');
@@ -57,30 +217,9 @@ function Coaches() {
     fetchCoaches();
   }, []);
 
-  const handleRequest = async (coachId: number) => {
-    setActionError('');
-
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/bookings`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ coachId }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setActionError(data.error || 'Failed to send request');
-        return;
-      }
-
-      setRequestedIds((prev) => [...prev, coachId]);
-    } catch (err) {
-      setActionError('Something went wrong while sending the request.');
-    }
+  const handleBookingSuccess = (coachId: number) => {
+    setRequestedIds((prev) => [...prev, coachId]);
+    setModalCoach(null);
   };
 
   return (
@@ -249,7 +388,7 @@ function Coaches() {
                     </span>
                   ) : (
                     <button
-                      onClick={() => handleRequest(coach.id)}
+                      onClick={() => setModalCoach(coach)}
                       style={{
                         background: 'var(--color-header)',
                         color: '#F7F5F0',
@@ -281,7 +420,23 @@ function Coaches() {
           </div>
         </div>
       </div>
+
+      {modalCoach && (
+        <BookingModal
+          coach={modalCoach}
+          onClose={() => setModalCoach(null)}
+          onSuccess={handleBookingSuccess}
+        />
+      )}
     </div>
+  );
+}
+
+function Coaches() {
+  return (
+    <Elements stripe={stripePromise}>
+      <CoachesInner />
+    </Elements>
   );
 }
 

@@ -6,6 +6,7 @@ const authRoutes = require('./routes/auth');
 const habitsRoutes = require('./routes/habits');
 const coachesRoutes = require('./routes/coaches');
 const bookingsRoutes = require('./routes/bookings');
+const stripeRoutes = require('./routes/stripe');
 
 const app = express();
 
@@ -39,6 +40,9 @@ app.use('/coaches', coachesRoutes);
 
 // Bookings routes
 app.use('/bookings', bookingsRoutes);
+
+// Stripe routes
+app.use('/stripe', stripeRoutes);
 
 const PORT = process.env.PORT || 5000;
 

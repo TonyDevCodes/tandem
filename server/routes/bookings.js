@@ -3,8 +3,9 @@ const router = express.Router();
 const pool = require('../db/pool');
 const verifyToken = require('../middleware/verifyToken');
 const requireRole = require('../middleware/requireRole');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-// POST /bookings - client kerkon nje coach
+// POST /bookings - client kerkon nje coach (dhe autorizohet pagesa me Stripe)
 router.post('/', verifyToken, requireRole('client'), async (req, res) => {
   const { coachId } = req.body;
   const clientId = req.user.id;
@@ -14,14 +15,58 @@ router.post('/', verifyToken, requireRole('client'), async (req, res) => {
   }
 
   try {
-    const result = await pool.query(
+    const coachResult = await pool.query(
+      'SELECT price_cents, stripe_account_id FROM users WHERE id = $1 AND role = $2',
+      [coachId, 'coach']
+    );
+
+    const coach = coachResult.rows[0];
+
+    if (!coach) {
+      return res.status(404).json({ error: 'Coach not found' });
+    }
+
+    if (!coach.stripe_account_id) {
+      return res.status(400).json({ error: "This coach hasn't set up payments yet" });
+    }
+
+    if (!coach.price_cents) {
+      return res.status(400).json({ error: "This coach hasn't set their price yet" });
+    }
+
+    const bookingResult = await pool.query(
       `INSERT INTO bookings (coach_id, client_id, status)
        VALUES ($1, $2, 'pending')
        RETURNING id, coach_id, client_id, status, created_at`,
       [coachId, clientId]
     );
 
-    res.status(201).json(result.rows[0]);
+    const booking = bookingResult.rows[0];
+
+    try {
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: coach.price_cents,
+        currency: 'eur',
+        capture_method: 'manual',
+        transfer_data: { destination: coach.stripe_account_id },
+      });
+
+      const updateResult = await pool.query(
+        `UPDATE bookings SET stripe_payment_intent_id = $1, payment_status = 'authorized'
+         WHERE id = $2
+         RETURNING id, coach_id, client_id, status, payment_status, stripe_payment_intent_id, created_at`,
+        [paymentIntent.id, booking.id]
+      );
+
+      res.status(201).json({
+        ...updateResult.rows[0],
+        client_secret: paymentIntent.client_secret,
+      });
+    } catch (stripeErr) {
+      console.error('Error creating PaymentIntent:', stripeErr);
+      await pool.query('DELETE FROM bookings WHERE id = $1', [booking.id]);
+      res.status(402).json({ error: 'Payment authorization failed. Please check your card details.' });
+    }
   } catch (err) {
     if (err.code === '23505') {
       // unique_violation - UNIQUE(coach_id, client_id)

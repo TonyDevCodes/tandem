@@ -76,7 +76,7 @@ router.post('/login', async (req, res) => {
 // ME — protected route, kthen user-in aktual bazuar në token
 router.get('/me', verifyToken, async (req, res) => {
   try {
-    const result = await pool.query('SELECT id, email, name, role FROM users WHERE id = $1', [req.user.id]);
+    const result = await pool.query('SELECT id, email, name, role, price_cents FROM users WHERE id = $1', [req.user.id]);
     const user = result.rows[0];
 
     if (!user) {

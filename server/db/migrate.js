@@ -46,6 +46,16 @@ CREATE TABLE IF NOT EXISTS bookings (
 );
 `;
 
+const addStripeColumnsToUsers = `
+ALTER TABLE users ADD COLUMN IF NOT EXISTS price_cents INTEGER;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_account_id VARCHAR(255);
+`;
+
+const addStripeColumnsToBookings = `
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS stripe_payment_intent_id VARCHAR(255);
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS payment_status VARCHAR(20) NOT NULL DEFAULT 'pending' CHECK (payment_status IN ('pending', 'authorized', 'captured', 'canceled'));
+`;
+
 async function migrate() {
   try {
     await pool.query(createUsersTable);
@@ -59,6 +69,12 @@ async function migrate() {
 
     await pool.query(createBookingsTable);
     console.log('Bookings table OK');
+
+    await pool.query(addStripeColumnsToUsers);
+    console.log('Stripe columns added to users');
+
+    await pool.query(addStripeColumnsToBookings);
+    console.log('Stripe columns added to bookings');
 
     process.exit(0);
   } catch (err) {
