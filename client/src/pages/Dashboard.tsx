@@ -608,25 +608,35 @@ function Dashboard() {
                       color: '#F7F5F0',
                       border: 'none',
                       borderRadius: 7,
-                      width: 30,
-                      height: 30,
+                      padding: '6px 12px',
+                      fontSize: 13,
+                      fontWeight: 500,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 4,
                     }}
                   >
-                    ✓
+                    <span>✓</span>
+                    <span>Accept</span>
                   </button>
                   <button
                     onClick={() => handleBookingAction(booking.id, 'rejected')}
-                    aria-label="Reject"
+                    aria-label="Decline"
                     style={{
                       background: 'transparent',
                       color: 'var(--color-text-muted)',
                       border: '0.5px solid var(--color-border)',
                       borderRadius: 7,
-                      width: 30,
-                      height: 30,
+                      padding: '6px 12px',
+                      fontSize: 13,
+                      fontWeight: 500,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 4,
                     }}
                   >
-                    ✕
+                    <span>✕</span>
+                    <span>Decline</span>
                   </button>
                 </div>
               </div>
