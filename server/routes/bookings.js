@@ -120,8 +120,9 @@ router.get('/coach/:coachId/accepted-clients', verifyToken, requireRole('coach')
   }
 });
 
-// PATCH /bookings/:bookingId - coach pranon ose refuzon
+// PATCH /bookings/:bookingId - coach pranon ose refuzon (capture/cancel pagesen ne Stripe)
 router.patch('/:bookingId', verifyToken, requireRole('coach'), async (req, res) => {
+  console.log('>>> PATCH BOOKINGS ROUTE HIT — NEW CODE <<<');
   const { bookingId } = req.params;
   const { status } = req.body;
 
@@ -130,18 +131,48 @@ router.patch('/:bookingId', verifyToken, requireRole('coach'), async (req, res) 
   }
 
   try {
-    const result = await pool.query(
-      `UPDATE bookings SET status = $1
-       WHERE id = $2 AND coach_id = $3
-       RETURNING id, coach_id, client_id, status, created_at`,
-      [status, bookingId, req.user.id]
+    const bookingResult = await pool.query(
+      `SELECT id, coach_id, client_id, status, stripe_payment_intent_id
+       FROM bookings
+       WHERE id = $1 AND coach_id = $2`,
+      [bookingId, req.user.id]
     );
 
-    if (result.rows.length === 0) {
+    const booking = bookingResult.rows[0];
+
+    if (!booking) {
       return res.status(404).json({ error: 'Booking not found or not yours' });
     }
 
-    res.json(result.rows[0]);
+    if (booking.status !== 'pending') {
+      return res.status(409).json({ error: 'This request has already been handled' });
+    }
+
+    let paymentStatus = null;
+
+    if (booking.stripe_payment_intent_id) {
+      try {
+        if (status === 'accepted') {
+          await stripe.paymentIntents.capture(booking.stripe_payment_intent_id);
+          paymentStatus = 'captured';
+        } else {
+          await stripe.paymentIntents.cancel(booking.stripe_payment_intent_id);
+          paymentStatus = 'canceled';
+        }
+      } catch (stripeErr) {
+        console.error('Error updating PaymentIntent:', stripeErr);
+        return res.status(402).json({ error: 'Failed to process payment for this request. Please try again.' });
+      }
+    }
+
+    const updateResult = await pool.query(
+      `UPDATE bookings SET status = $1, payment_status = COALESCE($2, payment_status)
+       WHERE id = $3 AND coach_id = $4
+       RETURNING id, coach_id, client_id, status, payment_status, stripe_payment_intent_id, created_at`,
+      [status, paymentStatus, bookingId, req.user.id]
+    );
+
+    res.json(updateResult.rows[0]);
   } catch (err) {
     console.error('Error updating booking:', err);
     res.status(500).json({ error: 'Server error while updating booking' });
