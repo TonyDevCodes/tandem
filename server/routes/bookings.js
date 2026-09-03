@@ -122,7 +122,6 @@ router.get('/coach/:coachId/accepted-clients', verifyToken, requireRole('coach')
 
 // PATCH /bookings/:bookingId - coach pranon ose refuzon (capture/cancel pagesen ne Stripe)
 router.patch('/:bookingId', verifyToken, requireRole('coach'), async (req, res) => {
-  console.log('>>> PATCH BOOKINGS ROUTE HIT — NEW CODE <<<');
   const { bookingId } = req.params;
   const { status } = req.body;
 
