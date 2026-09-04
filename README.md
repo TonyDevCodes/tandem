@@ -1,4 +1,4 @@
-# Tandem — Coach & Client Habit Tracker Marketplace
+# Tandem - Coach & Client Habit Tracker Marketplace
 
 A full-stack marketplace that connects fitness/nutrition coaches with their clients for daily habit tracking, progress monitoring, and payments.
 
