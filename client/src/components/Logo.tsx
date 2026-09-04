@@ -1,9 +1,10 @@
 type LogoProps = {
   size?: number;
   showText?: boolean;
+  textColor?: string;
 };
 
-export default function Logo({ size = 90, showText = true }: LogoProps) {
+export default function Logo({ size = 90, showText = true, textColor = '#fff' }: LogoProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
       <svg viewBox="0 0 100 100" width={size} height={size}>
@@ -25,7 +26,7 @@ export default function Logo({ size = 90, showText = true }: LogoProps) {
         <path d="M29 55 h42" stroke="#f2a341" strokeWidth="3.5" strokeLinecap="round" opacity="0.7" />
       </svg>
       {showText && (
-        <div style={{ color: '#fff', fontSize: 40, fontWeight: 500, fontFamily: 'Georgia, serif' }}>
+        <div style={{ color: textColor, fontSize: 40, fontWeight: 500, fontFamily: 'Georgia, serif' }}>
           Tandem
         </div>
       )}

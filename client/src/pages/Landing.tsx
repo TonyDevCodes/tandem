@@ -44,7 +44,7 @@ function Landing() {
       </svg>
 
       <div style={{ position: 'relative', maxWidth: 640, margin: '0 auto', padding: '80px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-        <Logo size={100} />
+        <Logo size={100} textColor="#3B6D11" />
 
         <p style={{ fontSize: 15, color: 'var(--color-text-muted)', margin: '20px 0 40px' }}>Daily habits. Real coaches. Real progress.</p>
 
