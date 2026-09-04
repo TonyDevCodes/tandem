@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Logo from '../components/Logo';
 
 function getInitials(name: string) {
   return name
@@ -14,8 +15,8 @@ function getInitials(name: string) {
 function FlameIcon({ color }: { color: string }) {
   return (
     <svg
-      width="13"
-      height="13"
+      width="14"
+      height="14"
       viewBox="0 0 24 24"
       fill="none"
       stroke={color}
@@ -28,6 +29,22 @@ function FlameIcon({ color }: { color: string }) {
   );
 }
 
+function ChevronUpIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4A2E0A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="6 15 12 9 18 15" />
+    </svg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  );
+}
+
 function StreakBadge({ streak }: { streak: number | undefined }) {
   if (streak === undefined) {
     return (
@@ -36,8 +53,8 @@ function StreakBadge({ streak }: { streak: number | undefined }) {
           background: 'var(--color-streak-zero-bg)',
           color: 'var(--color-streak-zero-text)',
           borderRadius: 'var(--radius-pill)',
-          padding: '4px 10px',
-          fontSize: 12,
+          padding: '7px 16px',
+          fontSize: 13,
           fontWeight: 500,
         }}
       >
@@ -50,11 +67,11 @@ function StreakBadge({ streak }: { streak: number | undefined }) {
     return (
       <span
         style={{
-          background: 'var(--color-streak-zero-bg)',
-          color: 'var(--color-streak-zero-text)',
+          background: 'linear-gradient(135deg, #639922, #3B6D11)',
+          color: '#fff',
           borderRadius: 'var(--radius-pill)',
-          padding: '4px 10px',
-          fontSize: 12,
+          padding: '7px 16px',
+          fontSize: 13,
           fontWeight: 500,
         }}
       >
@@ -66,18 +83,18 @@ function StreakBadge({ streak }: { streak: number | undefined }) {
   return (
     <span
       style={{
-        background: 'var(--color-streak-bg)',
-        color: 'var(--color-streak-text)',
+        background: 'linear-gradient(135deg, #FAC775, #EF9F27)',
+        color: '#412402',
         borderRadius: 'var(--radius-pill)',
-        padding: '4px 10px',
-        fontSize: 12,
+        padding: '7px 16px',
+        fontSize: 13,
         fontWeight: 500,
         display: 'inline-flex',
         alignItems: 'center',
         gap: 4,
       }}
     >
-      <FlameIcon color="var(--color-streak-text)" />
+      <FlameIcon color="#412402" />
       {streak}
     </span>
   );
@@ -101,6 +118,7 @@ function Dashboard() {
   const [priceLoading, setPriceLoading] = useState(false);
   const [priceError, setPriceError] = useState('');
   const [priceSaved, setPriceSaved] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
   const navigate = useNavigate();
 
   const token = localStorage.getItem('token');
@@ -207,6 +225,18 @@ function Dashboard() {
     fetchStripeStatus(parsedUser);
     fetchCoachPrice(parsedUser);
   }, [navigate]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 300);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -316,6 +346,10 @@ function Dashboard() {
 
   const pendingBookings = bookings.filter((b) => b.status === 'pending');
 
+  const bestStreak = habits.length
+    ? Math.max(0, ...habits.map((h) => streaks[h.id] ?? 0))
+    : 0;
+
   const cardStyle: React.CSSProperties = {
     background: 'var(--color-card-bg)',
     border: '0.5px solid var(--color-border)',
@@ -326,6 +360,18 @@ function Dashboard() {
     justifyContent: 'space-between',
     marginBottom: 8,
   };
+
+  const habitCardStyle = (streak: number | undefined): React.CSSProperties => ({
+    background: '#fff',
+    border: '1px solid var(--color-border)',
+    borderLeft: streak && streak > 0 ? '4px solid #D85A30' : '4px solid #639922',
+    borderRadius: 14,
+    padding: '14px 16px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  });
 
   const sectionLabelStyle: React.CSSProperties = {
     fontSize: 13,
@@ -339,72 +385,43 @@ function Dashboard() {
       <div
         style={{
           background: 'var(--color-header)',
-          padding: '24px 80px 28px',
+          padding: '32px 80px 28px',
           color: '#F7F5F0',
+          position: 'relative',
         }}
       >
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
-          <div
-            style={{
-              width: 52,
-              height: 52,
-              borderRadius: '50%',
-              border: '2px solid #F7F5F0',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <span
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: 24,
-                fontWeight: 500,
-                color: 'var(--color-accent)',
-              }}
-            >
-              T
-            </span>
-          </div>
-        </div>
-
         <div
           style={{
+            position: 'absolute',
+            top: 24,
+            right: 24,
+            width: 44,
+            height: 44,
+            borderRadius: '50%',
+            background: 'var(--color-accent)',
             display: 'flex',
-            justifyContent: 'space-between',
             alignItems: 'center',
-            marginBottom: 20,
+            justifyContent: 'center',
+            fontSize: 16,
+            fontWeight: 500,
+            color: 'var(--color-accent-text)',
           }}
         >
-          <span style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 500 }}>
-            Tandem
-          </span>
-          <div
-            style={{
-              width: 44,
-              height: 44,
-              borderRadius: '50%',
-              background: 'var(--color-accent)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 16,
-              fontWeight: 500,
-              color: 'var(--color-accent-text)',
-            }}
-          >
-            {getInitials(user.name)}
-          </div>
+          {getInitials(user.name)}
         </div>
 
-        <div style={{ maxWidth: 480, margin: '0 auto' }}>
-          <p style={{ fontSize: 13, color: 'var(--color-header-light)', margin: '0 0 2px' }}>
-            Welcome
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 8 }}>
+          <Logo size={70} />
+        </div>
+
+        <div style={{ maxWidth: 480, margin: '0 auto', textAlign: 'center' }}>
+          <p style={{ fontSize: 13, color: 'var(--color-header-light)', margin: '4px 0 2px' }}>
+            Welcome back
           </p>
           <p
             style={{
               fontFamily: 'var(--font-display)',
-              fontSize: 22,
+              fontSize: 20,
               fontWeight: 500,
               margin: 0,
             }}
@@ -415,33 +432,43 @@ function Dashboard() {
       </div>
 
       <div style={{ maxWidth: 480, margin: '0 auto', padding: '20px' }}>
-        <button
-          onClick={handleLogout}
+        <div
           style={{
-            background: 'transparent',
-            border: '0.5px solid var(--color-border)',
-            borderRadius: 'var(--radius-button)',
-            padding: '6px 12px',
-            fontSize: 13,
-            color: 'var(--color-text-muted)',
-            marginBottom: 20,
+            background: 'linear-gradient(135deg, #3B6D11, #639922)',
+            borderRadius: 'var(--radius-card)',
+            padding: '20px',
+            marginBottom: 24,
+            textAlign: 'center',
           }}
         >
-          Log out
-        </button>
+          <p style={{ fontSize: 13, color: '#EAF3DE', margin: '0 0 4px' }}>
+            {user.role === 'coach' ? 'Your momentum' : 'Keep going'}
+          </p>
+          <p style={{ fontSize: 28, fontWeight: 500, color: '#fff', margin: 0 }}>
+            {user.role === 'coach'
+              ? `${acceptedClients.length} client${acceptedClients.length === 1 ? '' : 's'} on track`
+              : bestStreak > 0
+              ? `${bestStreak} day streak`
+              : `${habits.length} habit${habits.length === 1 ? '' : 's'} to start`}
+          </p>
+          <p style={{ fontSize: 13, color: '#EAF3DE', margin: '4px 0 0' }}>
+            {user.role === 'coach' ? 'Keep it going, great week so far' : 'Every check-in counts'}
+          </p>
+        </div>
 
         {user.role === 'client' && (
           <button
             onClick={() => navigate('/coaches')}
             style={{
-              marginLeft: 10,
+              width: '100%',
               background: 'var(--color-header)',
               color: '#F7F5F0',
               border: 'none',
               borderRadius: 'var(--radius-button)',
-              padding: '7px 14px',
-              fontSize: 13,
+              padding: '12px',
+              fontSize: 14,
               fontWeight: 500,
+              marginBottom: 24,
             }}
           >
             Find a coach
@@ -456,15 +483,40 @@ function Dashboard() {
             )}
             <div
               style={{
-                ...cardStyle,
+                background: '#fff',
+                border: stripeStatus?.connected ? '1.5px solid #639922' : '0.5px solid var(--color-border)',
+                borderRadius: 'var(--radius-card)',
+                padding: '16px',
+                position: 'relative',
+                display: 'flex',
+                alignItems: 'center',
                 justifyContent: stripeStatus?.connected ? 'center' : 'space-between',
+                marginBottom: 8,
               }}
             >
+              {stripeStatus?.connected && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 10,
+                    right: 14,
+                    width: 22,
+                    height: 22,
+                    borderRadius: '50%',
+                    background: '#3B6D11',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <CheckIcon />
+                </div>
+              )}
               <div style={{ textAlign: stripeStatus?.connected ? 'center' : 'left' }}>
-                <p style={{ fontSize: 14, fontWeight: 500, margin: '0 0 2px' }}>
+                <p style={{ fontSize: 15, fontWeight: 500, margin: '0 0 2px', color: stripeStatus?.connected ? '#27500A' : 'var(--color-text)' }}>
                   {stripeStatus?.connected ? 'Stripe connected' : 'Connect Stripe to get paid'}
                 </p>
-                <p style={{ fontSize: 12, color: 'var(--color-text-muted)', margin: 0 }}>
+                <p style={{ fontSize: 13, color: 'var(--color-text-muted)', margin: 0 }}>
                   {stripeStatus?.connected
                     ? 'You can accept bookings and receive payouts.'
                     : 'Required before clients can book you.'}
@@ -475,13 +527,14 @@ function Dashboard() {
                   onClick={handleConnectStripe}
                   disabled={stripeLoading}
                   style={{
-                    background: 'var(--color-header)',
-                    color: '#F7F5F0',
+                    background: 'linear-gradient(135deg, #3B6D11, #639922)',
+                    color: '#fff',
                     border: 'none',
-                    borderRadius: 'var(--radius-button)',
-                    padding: '7px 14px',
+                    borderRadius: 10,
+                    padding: '9px 16px',
                     fontSize: 13,
                     fontWeight: 500,
+                    whiteSpace: 'nowrap',
                     opacity: stripeLoading ? 0.6 : 1,
                   }}
                 >
@@ -543,8 +596,10 @@ function Dashboard() {
                   onClick={handleSavePrice}
                   disabled={priceLoading}
                   style={{
-                    background: priceSaved ? 'var(--color-streak-text)' : 'var(--color-header)',
-                    color: '#F7F5F0',
+                    background: priceSaved
+                      ? 'linear-gradient(135deg, #EF9F27, #BA7517)'
+                      : 'linear-gradient(135deg, #3B6D11, #639922)',
+                    color: '#fff',
                     border: 'none',
                     borderRadius: 'var(--radius-button)',
                     padding: '9px 14px',
@@ -646,7 +701,7 @@ function Dashboard() {
 
         {user.role === 'coach' && (
           <div style={{ marginBottom: 28 }}>
-            <p style={sectionLabelStyle}>Create a habit</p>
+            <p style={{ fontSize: 18, fontWeight: 500, color: '#27500A', margin: '0 0 12px' }}>Create a habit</p>
             {acceptedClients.length === 0 ? (
               <p style={{ fontSize: 13, color: 'var(--color-text-muted)' }}>
                 No accepted clients yet — accept a request first.
@@ -655,10 +710,10 @@ function Dashboard() {
               <form
                 onSubmit={handleCreateHabit}
                 style={{
-                  background: 'var(--color-card-bg)',
-                  border: '0.5px solid var(--color-border)',
-                  borderRadius: 'var(--radius-card)',
-                  padding: 16,
+                  background: 'linear-gradient(160deg, #ffffff, #F3F7EC)',
+                  border: '1px solid #C0DD97',
+                  borderRadius: 16,
+                  padding: 20,
                 }}
               >
                 <div style={{ marginBottom: 12 }}>
@@ -678,10 +733,11 @@ function Dashboard() {
                     required
                     style={{
                       width: '100%',
-                      padding: '9px 10px',
-                      fontSize: 14,
-                      border: '0.5px solid var(--color-border)',
-                      borderRadius: 'var(--radius-button)',
+                      padding: '12px',
+                      fontSize: 15,
+                      border: '1px solid #C0DD97',
+                      borderRadius: 12,
+                      background: '#fff',
                       textAlign: 'center',
                       textAlignLast: 'center',
                     }}
@@ -711,10 +767,11 @@ function Dashboard() {
                     required
                     style={{
                       width: '100%',
-                      padding: '9px 10px',
-                      fontSize: 14,
-                      border: '0.5px solid var(--color-border)',
-                      borderRadius: 'var(--radius-button)',
+                      padding: '12px',
+                      fontSize: 15,
+                      border: '1px solid #C0DD97',
+                      borderRadius: 12,
+                      boxSizing: 'border-box',
                     }}
                   />
                 </div>
@@ -734,10 +791,11 @@ function Dashboard() {
                     onChange={(e) => setDescription(e.target.value)}
                     style={{
                       width: '100%',
-                      padding: '9px 10px',
-                      fontSize: 14,
-                      border: '0.5px solid var(--color-border)',
-                      borderRadius: 'var(--radius-button)',
+                      padding: '12px',
+                      fontSize: 15,
+                      border: '1px solid #C0DD97',
+                      borderRadius: 12,
+                      boxSizing: 'border-box',
                     }}
                   />
                 </div>
@@ -745,13 +803,13 @@ function Dashboard() {
                   type="submit"
                   style={{
                     width: '100%',
-                    padding: 10,
-                    fontSize: 14,
+                    padding: 13,
+                    fontSize: 15,
                     fontWeight: 500,
-                    color: '#F7F5F0',
-                    background: 'var(--color-header)',
+                    color: '#fff',
+                    background: 'linear-gradient(135deg, #3B6D11, #639922)',
                     border: 'none',
-                    borderRadius: 'var(--radius-button)',
+                    borderRadius: 12,
                   }}
                 >
                   Create habit
@@ -763,14 +821,14 @@ function Dashboard() {
 
         {error && <p style={{ color: '#B23A3A', fontSize: 13, marginBottom: 16 }}>{error}</p>}
 
-        <p style={sectionLabelStyle}>
+        <p style={{ fontSize: 18, fontWeight: 500, margin: '0 0 12px' }}>
           {user.role === 'coach' ? 'Habits you created' : 'Your habits'}
         </p>
         {habits.map((habit) => (
-          <div key={habit.id} style={cardStyle}>
+          <div key={habit.id} style={habitCardStyle(streaks[habit.id])}>
             <div>
-              <p style={{ fontSize: 14, fontWeight: 500, margin: '0 0 2px' }}>{habit.title}</p>
-              <p style={{ fontSize: 12, color: 'var(--color-text-muted)', margin: 0 }}>
+              <p style={{ fontSize: 16, fontWeight: 500, margin: '0 0 2px' }}>{habit.title}</p>
+              <p style={{ fontSize: 13, color: 'var(--color-text-muted)', margin: 0 }}>
                 {user.role === 'coach' ? habit.client_name : habit.description}
               </p>
             </div>
@@ -795,7 +853,69 @@ function Dashboard() {
             </div>
           </div>
         ))}
+
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            paddingTop: 24,
+            marginTop: 24,
+            borderTop: '0.5px solid var(--color-border)',
+          }}
+        >
+          <button
+            onClick={handleLogout}
+            style={{
+              background: 'transparent',
+              color: '#A32D2D',
+              border: '1px solid var(--color-heart)',
+              borderRadius: 'var(--radius-button)',
+              padding: '10px 24px',
+              fontSize: 14,
+              fontWeight: 500,
+            }}
+          >
+            Log out
+          </button>
+        </div>
       </div>
+
+      {showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          aria-label="Scroll to top"
+          style={{
+            position: 'fixed',
+            bottom: 24,
+            right: 24,
+            width: 50,
+            height: 50,
+            borderRadius: 14,
+            background: 'var(--color-accent)',
+            border: 'none',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 4px 10px rgba(0,0,0,0.15)',
+            cursor: 'pointer',
+            zIndex: 50,
+          }}
+        >
+          <ChevronUpIcon />
+          <span
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 15,
+              fontWeight: 500,
+              color: 'var(--color-accent-text)',
+              marginTop: -2,
+            }}
+          >
+            T
+          </span>
+        </button>
+      )}
     </div>
   );
 }

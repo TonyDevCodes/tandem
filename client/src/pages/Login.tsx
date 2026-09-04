@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
+import Logo from '../components/Logo';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -73,41 +74,8 @@ function Login() {
         }}
       >
         <div style={{ textAlign: 'center' }}>
-          <div
-            style={{
-              width: 56,
-              height: 56,
-              borderRadius: '50%',
-              border: '2px solid var(--color-header)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: '0 auto 16px',
-            }}
-          >
-            <span
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: 26,
-                fontWeight: 500,
-                color: 'var(--color-accent)',
-              }}
-            >
-              T
-            </span>
-          </div>
-          <h2
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 26,
-              fontWeight: 500,
-              color: 'var(--color-text)',
-              margin: '0 0 6px',
-            }}
-          >
-            Tandem
-          </h2>
-          <p style={{ fontSize: 13, color: 'var(--color-text-muted)', margin: 0 }}>
+          <Logo size={80} />
+          <p style={{ fontSize: 13, color: 'var(--color-text-muted)', margin: '16px 0 0' }}>
             Daily habits. Real coaches. Real progress.
           </p>
         </div>
@@ -135,10 +103,10 @@ function Login() {
               required
               style={{
                 width: '100%',
-                padding: '10px 12px',
-                fontSize: 14,
-                border: '0.5px solid var(--color-border)',
-                borderRadius: 'var(--radius-button)',
+                padding: '12px',
+                fontSize: 15,
+                border: '1.5px solid var(--color-accent)',
+                borderRadius: 12,
                 outline: 'none',
                 boxSizing: 'border-box',
               }}
@@ -164,10 +132,10 @@ function Login() {
               required
               style={{
                 width: '100%',
-                padding: '10px 12px',
-                fontSize: 14,
-                border: '0.5px solid var(--color-border)',
-                borderRadius: 'var(--radius-button)',
+                padding: '12px',
+                fontSize: 15,
+                border: '1px solid var(--color-border)',
+                borderRadius: 12,
                 outline: 'none',
                 boxSizing: 'border-box',
               }}
@@ -182,13 +150,13 @@ function Login() {
             type="submit"
             style={{
               width: '100%',
-              padding: 12,
-              fontSize: 14,
+              padding: 14,
+              fontSize: 15,
               fontWeight: 500,
-              color: '#F7F5F0',
-              background: 'var(--color-header)',
+              color: '#fff',
+              background: 'linear-gradient(135deg, #3B6D11, #639922)',
               border: 'none',
-              borderRadius: 'var(--radius-button)',
+              borderRadius: 12,
             }}
           >
             Log in

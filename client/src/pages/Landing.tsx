@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import Logo from '../components/Logo';
 
 function Landing() {
   const navigate = useNavigate();
@@ -8,16 +9,22 @@ function Landing() {
       number: '1',
       title: 'Find a coach',
       description: 'Browse coaches and send a request to the one that fits you.',
+      borderColor: '#F0997B',
+      leftBorder: '#D85A30',
     },
     {
       number: '2',
       title: 'Set your habits',
       description: 'Your coach creates daily habits tailored to your goals.',
+      borderColor: '#EF9F27',
+      leftBorder: '#BA7517',
     },
     {
       number: '3',
       title: 'Track your streak',
       description: 'Check in every day and watch your progress build up.',
+      borderColor: '#97C459',
+      leftBorder: '#3B6D11',
     },
   ];
 
@@ -37,17 +44,41 @@ function Landing() {
       </svg>
 
       <div style={{ position: 'relative', maxWidth: 640, margin: '0 auto', padding: '80px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-        <div style={{ width: 64, height: 64, borderRadius: '50%', border: '2px solid var(--color-header)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
-          <span style={{ fontFamily: 'var(--font-display)', fontSize: 30, fontWeight: 500, color: 'var(--color-accent)' }}>T</span>
-        </div>
+        <Logo size={100} />
 
-        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 36, fontWeight: 500, color: 'var(--color-text)', margin: '0 0 10px' }}>Tandem</h1>
-        <p style={{ fontSize: 15, color: 'var(--color-text-muted)', margin: '0 0 40px' }}>Daily habits. Real coaches. Real progress.</p>
+        <p style={{ fontSize: 15, color: 'var(--color-text-muted)', margin: '20px 0 40px' }}>Daily habits. Real coaches. Real progress.</p>
 
         <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 40 }}>
           {steps.map((step) => (
-            <div key={step.number} style={{ background: 'var(--color-card-bg)', border: '0.5px solid var(--color-border)', borderRadius: 'var(--radius-card)', padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 16, textAlign: 'left' }}>
-              <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--color-header)', color: '#F7F5F0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 500, flexShrink: 0 }}>
+            <div
+              key={step.number}
+              style={{
+                background: '#fff',
+                border: `1px solid ${step.borderColor}`,
+                borderLeft: `4px solid ${step.leftBorder}`,
+                borderRadius: 14,
+                padding: '18px 20px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 16,
+                textAlign: 'left',
+              }}
+            >
+              <div
+                style={{
+                  width: 34,
+                  height: 34,
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #3B6D11, #639922)',
+                  color: '#fff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 14,
+                  fontWeight: 500,
+                  flexShrink: 0,
+                }}
+              >
                 {step.number}
               </div>
               <div>
@@ -59,10 +90,36 @@ function Landing() {
         </div>
 
         <div style={{ width: '100%', display: 'flex', gap: 12 }}>
-          <button onClick={() => navigate('/signup')} style={{ flex: 1, padding: 12, fontSize: 14, fontWeight: 500, color: '#F7F5F0', background: 'var(--color-header)', border: 'none', borderRadius: 'var(--radius-button)', cursor: 'pointer' }}>
+          <button
+            onClick={() => navigate('/signup')}
+            style={{
+              flex: 1,
+              padding: 13,
+              fontSize: 15,
+              fontWeight: 500,
+              color: '#fff',
+              background: 'linear-gradient(135deg, #3B6D11, #639922)',
+              border: 'none',
+              borderRadius: 12,
+              cursor: 'pointer',
+            }}
+          >
             Sign up
           </button>
-          <button onClick={() => navigate('/login')} style={{ flex: 1, padding: 12, fontSize: 14, fontWeight: 500, color: 'var(--color-text)', background: 'transparent', border: '0.5px solid var(--color-border)', borderRadius: 'var(--radius-button)', cursor: 'pointer' }}>
+          <button
+            onClick={() => navigate('/login')}
+            style={{
+              flex: 1,
+              padding: 13,
+              fontSize: 15,
+              fontWeight: 500,
+              color: 'var(--color-header)',
+              background: '#fff',
+              border: '1.5px solid var(--color-header)',
+              borderRadius: 12,
+              cursor: 'pointer',
+            }}
+          >
             Log in
           </button>
         </div>

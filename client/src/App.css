@@ -5,28 +5,29 @@
   --color-header-light: #DCEBE1;
   --color-accent: #E8A33D;
   --color-accent-text: #4A2E0A;
+  --color-heart: #E24B4A;
 
   --color-bg: #F7F5F0;
   --color-card-bg: #FFFFFF;
   --color-border: #E4E1D8;
 
   --color-text: #3D3D3D;
-  --color-text-muted: #8A8A85;
+  --color-text-muted: #6B6B66;
 
   --color-streak-bg: #FBEAD2;
   --color-streak-text: #854F0B;
 
   --color-streak-zero-bg: #EFEBE0;
-  --color-streak-zero-text: #6B6B64;
+  --color-streak-zero-text: #55554F;
 
   --color-avatar-bg: #EAE7DC;
 
   --font-display: 'Fraunces', serif;
   --font-body: 'Inter', system-ui, sans-serif;
 
-  --radius-card: 10px;
+  --radius-card: 14px;
   --radius-pill: 20px;
-  --radius-button: 8px;
+  --radius-button: 12px;
 }
 
 * {

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import Logo from '../components/Logo';
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
@@ -9,6 +10,17 @@ interface Coach {
   id: number;
   name: string;
   email: string;
+}
+
+const GEAR_PATH =
+  'M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z';
+
+function Gear({ size, color, style }: { size: number; color: string; style?: React.CSSProperties }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" style={{ position: 'absolute', ...style }}>
+      <path d={GEAR_PATH} fill={color} />
+    </svg>
+  );
 }
 
 function getInitials(name: string) {
@@ -157,7 +169,7 @@ function BookingModal({
             disabled={processing || !stripe}
             style={{
               flex: 1,
-              background: 'var(--color-header)',
+              background: 'linear-gradient(135deg, #3B6D11, #639922)',
               color: '#F7F5F0',
               border: 'none',
               borderRadius: 'var(--radius-button)',
@@ -222,63 +234,24 @@ function CoachesInner() {
   };
 
   return (
-    <div style={{ position: 'relative', minHeight: '100vh', background: 'var(--color-bg)', overflow: 'hidden' }}>
-      <svg
-        width="100%"
-        height="100%"
-        style={{ position: 'absolute', top: 0, left: 0, zIndex: 0 }}
-        preserveAspectRatio="xMidYMid slice"
-        viewBox="0 0 1200 900"
-      >
-        <circle cx="90" cy="260" r="9" fill="#E8A33D" opacity="0.4" />
-        <circle cx="120" cy="260" r="9" fill="#E8A33D" opacity="0.4" />
-        <circle cx="150" cy="260" r="9" fill="#E8A33D" opacity="0.4" />
-        <circle cx="180" cy="260" r="9" fill="#D8D4C6" opacity="0.35" />
-        <circle cx="210" cy="260" r="9" fill="#D8D4C6" opacity="0.35" />
-
-        <circle cx="1020" cy="820" r="9" fill="#E8A33D" opacity="0.35" />
-        <circle cx="1050" cy="820" r="9" fill="#E8A33D" opacity="0.35" />
-        <circle cx="1080" cy="820" r="9" fill="#D8D4C6" opacity="0.3" />
-        <circle cx="1110" cy="820" r="9" fill="#D8D4C6" opacity="0.3" />
-      </svg>
-
-      <div style={{ position: 'relative', zIndex: 1 }}>
-        <div
-          style={{
-            background: 'var(--color-header)',
-            padding: '24px 80px 28px',
-            color: '#F7F5F0',
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
-            <div
-              style={{
-                width: 52,
-                height: 52,
-                borderRadius: '50%',
-                border: '2px solid #F7F5F0',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <span
-                style={{
-                  fontFamily: 'var(--font-display)',
-                  fontSize: 24,
-                  fontWeight: 500,
-                  color: 'var(--color-accent)',
-                }}
-              >
-                T
-              </span>
+    <div style={{ minHeight: '100vh', background: 'var(--color-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+      <div style={{ width: '100%', maxWidth: 480, margin: '40px 0' }}>
+        <div style={{ background: 'var(--color-card-bg)', borderRadius: 'var(--radius-card)', overflow: 'hidden', border: '0.5px solid var(--color-border)' }}>
+          <div
+            style={{
+              background: 'var(--color-header)',
+              padding: '28px 20px',
+              color: '#F7F5F0',
+              textAlign: 'center',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 10 }}>
+              <Logo size={64} showText={false} />
             </div>
-          </div>
-          <div style={{ maxWidth: 480, margin: '0 auto', textAlign: 'center' }}>
             <p
               style={{
                 fontFamily: 'var(--font-display)',
-                fontSize: 24,
+                fontSize: 22,
                 fontWeight: 500,
                 margin: '0 0 4px',
               }}
@@ -289,132 +262,160 @@ function CoachesInner() {
               Send a request — coaches accept before you start together.
             </p>
           </div>
-        </div>
 
-        <div
-          style={{
-            minHeight: 'calc(100vh - 190px)',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '20px',
-          }}
-        >
-          <div style={{ width: '100%', maxWidth: 480 }}>
+          <div style={{ position: 'relative' }}>
+            <svg width="70" height="20" style={{ position: 'absolute', top: 12, left: 8, opacity: 0.5, zIndex: 2 }}>
+              <circle cx="10" cy="10" r="5" fill="#E8A33D" />
+              <circle cx="30" cy="10" r="5" fill="#D8D4C6" />
+              <circle cx="50" cy="10" r="5" fill="#D8D4C6" />
+            </svg>
+
+            <div style={{ height: 26 }} />
             <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <div style={{ position: 'relative', width: 70, height: 44 }}>
+                <Gear size={32} color="#D85A30" style={{ left: 0, top: 6 }} />
+                <Gear size={26} color="#3B6D11" style={{ left: 22, top: -6 }} />
+                <Gear size={32} color="#E8A33D" style={{ left: 40, top: 6 }} />
+              </div>
+            </div>
+            <div style={{ height: 26 }} />
+
+            <div style={{ padding: '0 18px', textAlign: 'center' }}>
+              {!loading && !error && coaches.length > 0 && (
+                <>
+                  <p style={{ fontSize: 20, fontWeight: 500, color: '#3B6D11', margin: '0 0 3px' }}>
+                    {coaches.length} coach{coaches.length !== 1 ? 'es' : ''} available
+                  </p>
+                  <p style={{ fontSize: 14, color: 'var(--color-text-muted)', margin: 0 }}>
+                    Pick one and send a request to get started.
+                  </p>
+                </>
+              )}
+              {loading && (
+                <p style={{ fontSize: 13, color: 'var(--color-text-muted)' }}>Loading coaches...</p>
+              )}
+              {error && <p style={{ color: '#B23A3A', fontSize: 13 }}>{error}</p>}
+              {!loading && !error && coaches.length === 0 && (
+                <p style={{ fontSize: 13, color: 'var(--color-text-muted)' }}>
+                  No coaches available yet.
+                </p>
+              )}
+            </div>
+
+            {!loading && !error && coaches.length > 0 && (
+              <div style={{ padding: '16px 18px 4px' }}>
+                {coaches.map((coach) => (
+                  <div
+                    key={coach.id}
+                    style={{
+                      background: '#fff',
+                      border: '0.5px solid var(--color-border)',
+                      borderRadius: 'var(--radius-card)',
+                      padding: '14px 16px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      marginBottom: 10,
+                      boxShadow: '0 1px 3px rgba(23, 32, 27, 0.06)',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <div
+                        style={{
+                          width: 40,
+                          height: 40,
+                          borderRadius: '50%',
+                          background: 'transparent',
+                          border: '2px solid #D85A30',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: 14,
+                          fontWeight: 500,
+                          color: '#D85A30',
+                          flexShrink: 0,
+                        }}
+                      >
+                        {getInitials(coach.name)}
+                      </div>
+                      <div>
+                        <p style={{ fontSize: 16, fontWeight: 500, margin: 0 }}>{coach.name}</p>
+                        <p style={{ fontSize: 13, color: 'var(--color-text-muted)', margin: 0 }}>
+                          {coach.email}
+                        </p>
+                      </div>
+                    </div>
+
+                    {requestedIds.includes(coach.id) ? (
+                      <span
+                        style={{
+                          fontSize: 12,
+                          fontWeight: 500,
+                          color: '#8A8676',
+                          background: '#EFEBE0',
+                          borderRadius: 'var(--radius-pill)',
+                          padding: '6px 13px',
+                          flexShrink: 0,
+                        }}
+                      >
+                        Request sent
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => setModalCoach(coach)}
+                        style={{
+                          background: 'linear-gradient(135deg, #3B6D11, #639922)',
+                          color: '#F7F5F0',
+                          border: 'none',
+                          borderRadius: 'var(--radius-button)',
+                          padding: '9px 16px',
+                          fontSize: 13,
+                          fontWeight: 500,
+                          flexShrink: 0,
+                        }}
+                      >
+                        Request coach
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {!loading && !error && coaches.length > 0 && (
+              <p
+                style={{
+                  fontSize: 14,
+                  color: 'var(--color-text-muted)',
+                  textAlign: 'center',
+                  margin: '10px 0 4px',
+                }}
+              >
+                Coaches typically respond within a day.
+              </p>
+            )}
+
+            <div style={{ padding: '12px 18px 20px', display: 'flex', justifyContent: 'center' }}>
               <button
                 onClick={() => navigate('/dashboard')}
                 style={{
                   background: 'transparent',
                   border: '0.5px solid var(--color-border)',
                   borderRadius: 'var(--radius-button)',
-                  padding: '6px 12px',
+                  padding: '8px 16px',
                   fontSize: 13,
                   color: 'var(--color-text-muted)',
-                  marginBottom: 20,
                 }}
               >
                 Back to dashboard
               </button>
             </div>
 
-            {loading && (
-              <p style={{ fontSize: 13, color: 'var(--color-text-muted)' }}>Loading coaches...</p>
-            )}
-            {error && <p style={{ color: '#B23A3A', fontSize: 13 }}>{error}</p>}
-
-            {!loading && !error && coaches.length === 0 && (
-              <p style={{ fontSize: 13, color: 'var(--color-text-muted)' }}>
-                No coaches available yet.
-              </p>
-            )}
-
-            {!loading &&
-              !error &&
-              coaches.map((coach) => (
-                <div
-                  key={coach.id}
-                  style={{
-                    background: 'var(--color-card-bg)',
-                    border: '0.5px solid var(--color-border)',
-                    borderRadius: 'var(--radius-card)',
-                    padding: '12px 14px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    marginBottom: 8,
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <div
-                      style={{
-                        width: 34,
-                        height: 34,
-                        borderRadius: '50%',
-                        background: 'var(--color-avatar-bg)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: 12,
-                        fontWeight: 500,
-                        color: 'var(--color-text)',
-                      }}
-                    >
-                      {getInitials(coach.name)}
-                    </div>
-                    <div>
-                      <p style={{ fontSize: 14, fontWeight: 500, margin: 0 }}>{coach.name}</p>
-                      <p style={{ fontSize: 12, color: 'var(--color-text-muted)', margin: 0 }}>
-                        {coach.email}
-                      </p>
-                    </div>
-                  </div>
-
-                  {requestedIds.includes(coach.id) ? (
-                    <span
-                      style={{
-                        fontSize: 12,
-                        fontWeight: 500,
-                        color: 'var(--color-streak-zero-text)',
-                        background: 'var(--color-streak-zero-bg)',
-                        borderRadius: 'var(--radius-pill)',
-                        padding: '5px 12px',
-                      }}
-                    >
-                      Request sent
-                    </span>
-                  ) : (
-                    <button
-                      onClick={() => setModalCoach(coach)}
-                      style={{
-                        background: 'var(--color-header)',
-                        color: '#F7F5F0',
-                        border: 'none',
-                        borderRadius: 'var(--radius-button)',
-                        padding: '7px 14px',
-                        fontSize: 12,
-                        fontWeight: 500,
-                      }}
-                    >
-                      Request coach
-                    </button>
-                  )}
-                </div>
-              ))}
-
-            {!loading && !error && coaches.length > 0 && (
-              <p
-                style={{
-                  fontSize: 12,
-                  color: 'var(--color-text-muted)',
-                  textAlign: 'center',
-                  marginTop: 24,
-                }}
-              >
-                Coaches typically respond within a day.
-              </p>
-            )}
+            <svg width="70" height="20" style={{ position: 'absolute', bottom: 12, right: 8, opacity: 0.5, zIndex: 2 }}>
+              <circle cx="10" cy="10" r="5" fill="#D8D4C6" />
+              <circle cx="30" cy="10" r="5" fill="#E8A33D" />
+              <circle cx="50" cy="10" r="5" fill="#E8A33D" />
+            </svg>
           </div>
         </div>
       </div>

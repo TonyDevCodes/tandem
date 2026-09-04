@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
+import Logo from '../components/Logo';
 
 function Signup() {
   const [name, setName] = useState('');
@@ -77,36 +78,14 @@ function Signup() {
         }}
       >
         <div style={{ textAlign: 'center' }}>
-          <div
-            style={{
-              width: 56,
-              height: 56,
-              borderRadius: '50%',
-              border: '2px solid var(--color-header)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: '0 auto 16px',
-            }}
-          >
-            <span
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: 26,
-                fontWeight: 500,
-                color: 'var(--color-accent)',
-              }}
-            >
-              T
-            </span>
-          </div>
+          <Logo size={70} showText={false} />
           <h2
             style={{
               fontFamily: 'var(--font-display)',
               fontSize: 26,
               fontWeight: 500,
               color: 'var(--color-text)',
-              margin: '0 0 6px',
+              margin: '14px 0 6px',
             }}
           >
             Create account
@@ -225,13 +204,14 @@ function Signup() {
                 onClick={() => setRole('client')}
                 style={{
                   flex: 1,
-                  padding: 10,
+                  padding: 9,
                   fontSize: 13,
                   fontWeight: 500,
                   borderRadius: 20,
-                  border: role === 'client' ? '1.5px solid var(--color-header)' : '1.5px solid var(--color-border)',
-                  background: role === 'client' ? 'var(--color-header)' : 'transparent',
-                  color: role === 'client' ? '#F7F5F0' : 'var(--color-text-muted)',
+                  background: 'linear-gradient(135deg, #D89A3D, #C98A2D)',
+                  color: '#fff',
+                  border: role === 'client' ? '2px solid #4A2E0A' : '2px solid transparent',
+                  boxShadow: role === 'client' ? '0 2px 6px rgba(0,0,0,0.2)' : 'none',
                   cursor: 'pointer',
                 }}
               >
@@ -242,13 +222,14 @@ function Signup() {
                 onClick={() => setRole('coach')}
                 style={{
                   flex: 1,
-                  padding: 10,
+                  padding: 9,
                   fontSize: 13,
                   fontWeight: 500,
                   borderRadius: 20,
-                  border: role === 'coach' ? '1.5px solid var(--color-header)' : '1.5px solid var(--color-border)',
-                  background: role === 'coach' ? 'var(--color-header)' : 'transparent',
-                  color: role === 'coach' ? '#F7F5F0' : 'var(--color-text-muted)',
+                  background: 'linear-gradient(135deg, #F2C97A, #EAB85E)',
+                  color: '#4A2E0A',
+                  border: role === 'coach' ? '2px solid #4A2E0A' : '2px solid transparent',
+                  boxShadow: role === 'coach' ? '0 2px 6px rgba(0,0,0,0.2)' : 'none',
                   cursor: 'pointer',
                 }}
               >
@@ -265,13 +246,13 @@ function Signup() {
             type="submit"
             style={{
               width: '100%',
-              padding: 12,
-              fontSize: 14,
+              padding: 13,
+              fontSize: 15,
               fontWeight: 500,
-              color: '#F7F5F0',
-              background: 'var(--color-header)',
+              color: '#fff',
+              background: 'linear-gradient(135deg, #3B6D11, #639922)',
               border: 'none',
-              borderRadius: 'var(--radius-button)',
+              borderRadius: 12,
             }}
           >
             Sign up
